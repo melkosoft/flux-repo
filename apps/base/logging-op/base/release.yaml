@@ -1,15 +1,19 @@
+---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: podinfo
+  name: logging-operator
+  namespace: logging
 spec:
-  releaseName: podinfo
+  releaseName: logging
+#  targetNamespace: logging
   chart:
     spec:
-      chart: podinfo
+      chart: logging-operator
+      version: '3.9.0'
       sourceRef:
         kind: HelmRepository
-        name: podinfo
+        name: banzaicloud
         namespace: flux-system
   interval: 5m
   install:
