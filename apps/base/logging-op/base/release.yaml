@@ -16,6 +16,7 @@ spec:
         name: banzaicloud
         namespace: flux-system
   interval: 5m
+  createCustomResource: false
   install:
     remediation:
       retries: 3
