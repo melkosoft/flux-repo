@@ -1,32 +1,30 @@
-#apiVersion: kustomize.config.k8s.io/v1beta1
-#kind: Kustomization
-#resources:
-#- ./logging-op
----
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
-  name: logging
+  name: settings
   namespace: flux-system
 spec:
   interval: 10m0s
+  dependsOn:
+    - name: logging-base
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./apps/base/logging-op
+  path: ./apps/base/logging-op/config
   prune: true
   validation: client
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
-  name: podinfo
+  name: logging-base
   namespace: flux-system
 spec:
   interval: 10m0s
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./apps/base/podinfo
+  path: ./apps/base/logging-op/base
   prune: true
   validation: client
+
