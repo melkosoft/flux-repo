@@ -16,7 +16,7 @@ spec:
         name: banzaicloud
         namespace: flux-system
   interval: 5m
-  skipCRDs: true
   install:
+    skipCRDs: true
     remediation:
       retries: 3
