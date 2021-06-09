@@ -7,9 +7,11 @@ spec:
   chart:
     spec:
       chart: podinfo
-      namespace: default
       sourceRef:
         kind: HelmRepository
         name: podinfo
         namespace: flux-system
-
+  interval: 5m
+  install:
+    remediation:
+      retries: 3
