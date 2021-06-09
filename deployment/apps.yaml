@@ -25,3 +25,6 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./prerequisites
+  prune: true
+  validation: client
+
