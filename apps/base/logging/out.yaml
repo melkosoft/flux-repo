@@ -30,6 +30,26 @@ spec:
     remediation:
       retries: 3
   interval: 5m
+  releaseName: operator
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: logging-operator-logging
+  namespace: logging
+spec:
+  chart:
+    spec:
+      chart: logging-operator
+      sourceRef:
+        kind: HelmRepository
+        name: banzaicloud
+        namespace: flux-system
+      version: 3.10.0
+  install:
+    remediation:
+      retries: 3
+  interval: 5m
   releaseName: logging
   values:
     clusterFlows:
@@ -85,7 +105,7 @@ spec:
           ssl_version: TLSv1_2
           user: admin
           with_transporter_log: true
-    controlNamespace: "logging"
+    controlNamespace: logging
     fluentbit:
       image:
         pullPolicy: IfNotPresent
