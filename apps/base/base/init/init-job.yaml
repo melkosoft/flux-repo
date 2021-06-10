@@ -11,7 +11,7 @@ spec:
       annotations:
         iam.amazonaws.com/role: arn:aws:iam::846014624907:role/efk-keys
     spec:
-      automountServiceAccountToken: true
+#      automountServiceAccountToken: true
       containers:
       - command:
         - python
@@ -31,14 +31,14 @@ spec:
         image: mmamaenko/es-reloader:0.1.6
         imagePullPolicy: IfNotPresent
         name: es-reload
-        volumeMounts:
-        - mountPath: /tmp/json
-          name: efk-iml        
-      serviceAccount: efk-reload
-      serviceAccountName: efk-reload
+#        volumeMounts:
+#        - mountPath: /tmp/json
+#          name: efk-iml        
+#      serviceAccount: efk-reload
+#      serviceAccountName: efk-reload
       terminationGracePeriodSeconds: 30
       restartPolicy: Never
-      volumes:
-       - name: efk-iml
-         configMap:
-           name: efk-iml
+#      volumes:
+#       - name: efk-iml
+#         configMap:
+#           name: efk-iml
