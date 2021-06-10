@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: elastic-init
+spec:
+  backoffLimit: 3
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      annotations:
+        iam.amazonaws.com/role: arn:aws:iam::846014624907:role/efk-keys
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - command:
+        - python
+        - es-init.py
+        - --delay
+        - "240"
+        - --int
+        - --ssl
+        - --label
+        - component=elasticsearch
+        - --secret
+        - efk-mgmt
+        - --path
+        - /tmp/json
+        - --tenants
+        - hpbp-dev,hpbp-int,hpbp-stg
+        image: mmamaenko/es-reloader:0.1.6
+        imagePullPolicy: IfNotPresent
+        name: es-reload
+        volumeMounts:
+        - mountPath: /tmp/json
+          name: efk-iml        
+      serviceAccount: efk-reload
+      serviceAccountName: efk-reload
+      terminationGracePeriodSeconds: 30
+      restartPolicy: Never
+      volumes:
+       - name: efk-iml
+         configMap:
+           name: efk-iml
