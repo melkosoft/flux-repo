@@ -39,9 +39,11 @@ spec:
   values:
     controlNamespace: logging
     fluentd:
-      fluentdPvcSpec:
-        resources:
-          storageClassName: "local-storage"
+      bufferStorageVolume:
+        pvc:
+          spec:
+            resources:
+              storageClassName: "local-storage"
       logLevel: debug
       resources:
         requests:
