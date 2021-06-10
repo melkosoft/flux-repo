@@ -12,4 +12,7 @@ spec:
   path: ./apps/base/logging-op/base
   prune: true
   validation: client
-
+  healthChecks:
+   - kind: Deployment
+     name: logging-operator
+     namespace: logging
