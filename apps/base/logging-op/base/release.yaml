@@ -6,7 +6,6 @@ metadata:
   namespace: logging
 spec:
   releaseName: logging
-#  targetNamespace: logging
   chart:
     spec:
       chart: logging-operator
@@ -16,6 +15,7 @@ spec:
         name: banzaicloud
         namespace: flux-system
   interval: 5m
+  wait: true
   install:
     skipCRDs: true
     remediation:
