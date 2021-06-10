@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: logging
+---
+apiVersion: v1
+data:
+  password: cGFzc3dvcmQxMjMK
+  username: YWRtaW4=
+kind: Secret
+metadata:
+  name: es-secrets
+  namespace: logging
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: logging-operator
+  namespace: logging
+spec:
+  chart:
+    spec:
+      chart: logging-operator
+      sourceRef:
+        kind: HelmRepository
+        name: banzaicloud
+        namespace: flux-system
+      version: 3.10.0
+  install:
+    remediation:
+      retries: 3
+  interval: 5m
+  releaseName: logging
+  values:
+    clusterFlows:
+    - name: flow-kube-system
+      spec:
+        filters:
+        - dedot:
+            de_dot_nested: true
+            de_dot_separator: _
+        - tag_normaliser:
+            format: ${namespace_name}.${pod_name}.${container_name}
+        - parser:
+            parse:
+              type: none
+            remove_key_name_field: true
+            reserve_data: true
+        globalOutputRefs:
+        - cluster-kube-system
+        match:
+        - select:
+            labels:
+              k8s-app: kube-dns
+            namespaces:
+            - kube-system
+    clusterOutputs:
+    - name: cluster-kube-system
+      spec:
+        elasticsearch:
+          buffer:
+            chunk_limit_size: 4MB
+            flush_interval: 30s
+            flush_mode: interval
+            flush_thread_count: 4
+            overflow_action: drop_oldest_chunk
+            retry_max_interval: 30s
+            retry_timeout: 1h
+            retry_type: exponential_backoff
+            total_limit_size: 1024MB
+          host: elasticsearch.logging.svc.cluster.local
+          include_timestamp: true
+          index_name: kube-system
+          password:
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: es-secrets
+          port: 9200
+          reconnect_on_error: true
+          reload_connections: false
+          reload_on_failure: true
+          scheme: https
+          ssl_verify: false
+          ssl_version: TLSv1_2
+          user: admin
+          with_transporter_log: true
+    controlNamespace: "logging"
+    fluentbit:
+      image:
+        pullPolicy: IfNotPresent
+        repository: fluent/fluent-bit
+      resources:
+        limits:
+          cpu: 400m
+          memory: 256M
+        requests:
+          cpu: 200m
+          memory: 100M
+      tolerations:
+      - operator: Exists
+    fluentd:
+      fluentOutLogrotate:
+        enabled: true
+      logLevel: debug
+      resources:
+        limits:
+          cpu: "1"
+          memory: 1Gi
+        requests:
+          cpu: 200m
+          memory: 500M
+      scaling:
+        replicas: 1
