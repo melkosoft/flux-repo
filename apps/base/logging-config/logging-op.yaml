@@ -2,14 +2,18 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
-  name: logging-base
+  name: config
   namespace: flux-system
 spec:
   interval: 10m0s
+  force: true
+  dependsOn:
+    - name: logging-base
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./apps/base/logging-op/base
+  path: ./apps/base/logging-config/config
   prune: true
   validation: client
+
 
