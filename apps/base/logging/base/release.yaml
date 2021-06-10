@@ -1,0 +1,79 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: logging-operator
+spec:
+  releaseName: operator
+  chart:
+    spec:
+      chart: logging-operator
+      version: '3.10.0'
+      sourceRef:
+        kind: HelmRepository
+        name: banzaicloud
+        namespace: flux-system
+  interval: 5m
+  install:
+#    skipCRDs: true
+    remediation:
+      retries: 3
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: logging-operator-logging
+spec:
+  releaseName: logging
+  chart:
+    spec:
+      chart: logging-operator
+      version: '3.10.0'
+      sourceRef:
+        kind: HelmRepository
+        name: banzaicloud
+        namespace: flux-system
+  interval: 5m
+  install:
+    remediation:
+      retries: 3
+  values:
+    controlNamespace: logging
+    fluentd:
+      logLevel: debug
+      resources:
+        requests:
+          cpu: "200m"
+          memory: "500M"
+        limits:
+          cpu: "1"
+          memory: "1Gi"
+#      tolerations:
+#      - key: "onlyusefor"
+#        operator: "Equal"
+#        value: "es"
+#        effect: "NoSchedule"  
+      fluentOutLogrotate:
+        enabled: true
+#      image: 
+#        repository: fluent/fluentd
+#        tag: v1.12-1
+      scaling:
+        replicas: 1
+    fluentbit:
+      tolerations:
+       - operator: "Exists"
+      resources:
+        requests:
+          cpu: 200m
+          memory: 100M
+        limits:
+          cpu: "400m"
+          memory: 256M
+      image:
+        pullPolicy: IfNotPresent
+        repository: fluent/fluent-bit
+        # tag: 1.6.2-debug
+    clusterOutputs: []
+    clusterFlows: []
+
