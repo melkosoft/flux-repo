@@ -4,7 +4,6 @@ kind: HelmRelease
 metadata:
   name: logging-operator
 spec:
-  chart:
   values:
     clusterFlows:
     - name: flow-kube-system
