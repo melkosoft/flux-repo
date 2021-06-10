@@ -1,0 +1,25 @@
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: ClusterFlow
+metadata:
+  name: flow-kube-system
+spec:
+  match:
+    - select:
+        namespaces:
+         - kube-system
+        labels:
+          k8s-app: kube-dns
+  filters:
+    - dedot:
+        de_dot_separator: "_"
+        de_dot_nested: true
+    - tag_normaliser: 
+        format: ${namespace_name}.${pod_name}.${container_name}
+    - parser:
+        remove_key_name_field: true
+        reserve_data: true
+        parse:
+          type: none
+  globalOutputRefs:
+    - cluster-kube-system
